@@ -31,13 +31,13 @@ class CommentSearch extends Comment {
 			return $dataProvider;
 		}
 
-		$query->andFilterWhere(['like', 'tbl_comment.content', $this->content])
+		$query->andFilterWhere(['like', 'comment.content', $this->content])
 		      ->andFilterWhere(['like', 'status', $this->status])
 		      ->andFilterWhere(['like', 'create_time', $this->create_time])
 		      ->andFilterWhere(['like', 'author', $this->author])
 		      ->andFilterWhere(['like', 'email', $this->email])
 		      ->andFilterWhere(['like', 'url', $this->url])
-		      ->andFilterWhere(['like', 'tbl_post.title', $this->post_title]);
+		      ->andFilterWhere(['like', 'post.title', $this->post_title]);
 
 		return $dataProvider;
 

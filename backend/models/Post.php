@@ -33,7 +33,7 @@ class Post extends \yii\db\ActiveRecord {
 	 */
 	public function rules() {
 		return [
-			[['title', 'content', 'status', 'author_id'], 'required'],
+			[['title', 'content', 'status'], 'required'],
 			[['content', 'tags'], 'string'],
 			[['status', 'create_time', 'update_time', 'author_id'], 'integer'],
 			[['title'], 'string', 'max' => 128],
@@ -94,14 +94,31 @@ class Post extends \yii\db\ActiveRecord {
 		return $selected;
 	}
 
+	public function beforeSave($insert) {
+		if (parent::beforeSave($insert)) {
+			$this->author_id = Yii::$app->user->id;
+			if ($this->isNewRecord) {
+				$this->create_time = time();
+				$this->update_time = time();
+			} else {
+				$this->update_time = time();
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public function afterSave($insert, $changedAttributes) {
 		$selected = Yii::$app->request->post('PostCategory');
 		\backend\models\PostCategory::deleteAll(['post_id' => $this->id]);
 		$insert_data = [];
-		foreach ($selected as $v) {
-			$insert_data[] = [$this->id, $v];
-		}
+		if (count($selected) > 0) {
+			foreach ($selected as $v) {
+				$insert_data[] = [$this->id, $v];
+			}
 
-		Yii::$app->db->createCommand()->batchInsert('post_category', ['post_id', 'category_id'], $insert_data)->execute();
+			Yii::$app->db->createCommand()->batchInsert('post_category', ['post_id', 'category_id'], $insert_data)->execute();
+		}
 	}
 }

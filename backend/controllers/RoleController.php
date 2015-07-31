@@ -2,47 +2,19 @@
 
 namespace backend\controllers;
 
-use backend\models\Post;
+use backend\models\Role;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 /**
- * PostController implements the CRUD actions for Post model.
+ * RoleController implements the CRUD actions for Role model.
  */
-class PostController extends Controller {
+class RoleController extends Controller {
 	public function behaviors() {
 		return [
-			'access' => [
-				'class' => AccessControl::className(),
-				'only' => ['index', 'create', 'update', 'delete'],
-				'rules' => [
-					[
-						'actions' => ['index'],
-						'allow' => true,
-						'roles' => ['admin_post'],
-					],
-					[
-						'actions' => ['create'],
-						'allow' => true,
-						'roles' => ['add_post'],
-					],
-					[
-						'actions' => ['update'],
-						'allow' => true,
-						'roles' => ['edit_post'],
-					],
-					[
-						'actions' => ['delete'],
-						'allow' => true,
-						'roles' => ['delete_post'],
-					],
-
-				],
-			],
 			'verbs' => [
 				'class' => VerbFilter::className(),
 				'actions' => [
@@ -53,12 +25,12 @@ class PostController extends Controller {
 	}
 
 	/**
-	 * Lists all Post models.
+	 * Lists all Role models.
 	 * @return mixed
 	 */
 	public function actionIndex() {
 		$dataProvider = new ActiveDataProvider([
-			'query' => Post::find(),
+			'query' => Role::find(),
 		]);
 
 		return $this->render('index', [
@@ -67,8 +39,8 @@ class PostController extends Controller {
 	}
 
 	/**
-	 * Displays a single Post model.
-	 * @param integer $id
+	 * Displays a single Role model.
+	 * @param string $id
 	 * @return mixed
 	 */
 	public function actionView($id) {
@@ -78,20 +50,17 @@ class PostController extends Controller {
 	}
 
 	/**
-	 * Creates a new Post model.
+	 * Creates a new Role model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 * @return mixed
 	 */
 	public function actionCreate() {
-		$model = new Post();
+		$model = new Role();
 
-		if ($model->load(Yii::$app->request->post())) {
-			if ($model->save()) {
-				return $this->redirect(['view', 'id' => $model->id]);
-			} else {
-				print_r($model->getErrors());
-			}
-
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$model->save();
+			// print_r($_POST);
+			return $this->redirect(['view', 'id' => $model->name]);
 		} else {
 			return $this->render('create', [
 				'model' => $model,
@@ -100,16 +69,16 @@ class PostController extends Controller {
 	}
 
 	/**
-	 * Updates an existing Post model.
+	 * Updates an existing Role model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id
+	 * @param string $id
 	 * @return mixed
 	 */
 	public function actionUpdate($id) {
 		$model = $this->findModel($id);
 
 		if ($model->load(Yii::$app->request->post()) && $model->save()) {
-			return $this->redirect(['view', 'id' => $model->id]);
+			return $this->redirect(['view', 'id' => $model->name]);
 		} else {
 			return $this->render('update', [
 				'model' => $model,
@@ -118,26 +87,30 @@ class PostController extends Controller {
 	}
 
 	/**
-	 * Deletes an existing Post model.
+	 * Deletes an existing Role model.
 	 * If deletion is successful, the browser will be redirected to the 'index' page.
-	 * @param integer $id
+	 * @param string $id
 	 * @return mixed
 	 */
 	public function actionDelete($id) {
-		$this->findModel($id)->delete();
-
-		return $this->redirect(['index']);
+		$item_name = $this->findModel($id);
+		$f = \backend\models\AuthAssignment::findOne($id);
+		if ($f != null) {
+			$f->delete();
+		}
+		$item_name->delete();
+		return $this->redirect(['user/index']);
 	}
 
 	/**
-	 * Finds the Post model based on its primary key value.
+	 * Finds the Role model based on its primary key value.
 	 * If the model is not found, a 404 HTTP exception will be thrown.
-	 * @param integer $id
-	 * @return Post the loaded model
+	 * @param string $id
+	 * @return Role the loaded model
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
 	protected function findModel($id) {
-		if (($model = Post::findOne($id)) !== null) {
+		if (($model = Role::findOne($id)) !== null) {
 			return $model;
 		} else {
 			throw new NotFoundHttpException('The requested page does not exist.');

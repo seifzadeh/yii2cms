@@ -1,29 +1,30 @@
 <?php
-use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model \common\models\LoginForm */
+use yii\captcha\Captcha;
+use yii\helpers\Html;
 
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill out the following fields to login:</p>
 
-    <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
-                <?= $form->field($model, 'username') ?>
-                <?= $form->field($model, 'password')->passwordInput() ?>
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+    <div class="container">
+        <div class="card card-container">
+            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+            <p id="profile-name" class="profile-name-card"></p>
+             <?php $form = ActiveForm::begin(['id' => 'login-form', 'options' => ['class' => 'form-signin']]);?>
+                <span id="reauth-email" class="reauth-email"></span>
+                 <?=$form->field($model, 'username')?>
+                <?=$form->field($model, 'password')->passwordInput()?>
+                <?=$form->field($model, 'verifyCode')->widget(Captcha::className());?>
+                <?=$form->field($model, 'rememberMe')->checkbox()?>
                 <div class="form-group">
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                    <?=Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button'])?>
                 </div>
-            <?php ActiveForm::end(); ?>
+             <?php ActiveForm::end();?>
         </div>
     </div>
-</div>
+
+
+
+
